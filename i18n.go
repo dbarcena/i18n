@@ -32,6 +32,7 @@ func (i18n *I18n) SetMoney(currency string) {
 	case CURRENCY_NOK:
 		i18n.ac = accounting.NewAccounting("kr", 2, ".", ",", "%v %s", "-%v %s", "")
 	case CURRENCY_MXN:
+		i18n.ac = accounting.NewAccounting("$", 2, ",", ".", "%s %v", "-%s %v", "")
 	default:
 		i18n.ac = accounting.NewAccounting("$", 2, ",", ".", "%s %v", "-%s %v", "")
 	}
