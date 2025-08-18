@@ -1,6 +1,10 @@
 package i18n
 
-import "github.com/leekchan/accounting"
+import (
+	"strings"
+
+	"github.com/leekchan/accounting"
+)
 
 const (
 	CURRENCY_EUR = "EUR"
@@ -11,29 +15,84 @@ const (
 	COUNTRY_ES = "ES"
 	COUNTRY_NO = "NO"
 	COUNTRY_EN = "EN"
+	COUNTRY_MX = "MX"
 )
 
+type nodes_t map[string]interface{}
+type textos_t map[string]string
+type lang_t struct {
+	textos textos_t
+}
+
 type I18n struct {
-	ac *accounting.Accounting
+	ac       *accounting.Accounting
+	currency string
+	country  string
+	lang     string
+
+	fmtDate       string
+	fmtTime       string
+	fmtDateTime   string
+	fmtDateTimeTz string
+
+	langs map[string]*lang_t
 }
 
 func New() *I18n {
 
-	i18n := new(I18n)
+	f := new(I18n)
+	f.langs = make(map[string]*lang_t)
 
-	return i18n
+	f.SetMoney(CURRENCY_EUR) // Default currency
+	f.SetCountry(COUNTRY_ES) // Default country
+
+	return f
 }
 
-func (i18n *I18n) SetMoney(currency string) {
+func (f *I18n) SetLang(lang string) {
+	f.lang = lang
+}
 
-	switch currency {
+func (f *I18n) SetMoney(currency string) {
+
+	f.currency = strings.ToUpper(currency)
+
+	switch f.currency {
 	case CURRENCY_EUR:
-		i18n.ac = accounting.NewAccounting("€", 2, ".", ",", "%v %s", "-%v %s", "")
+		f.ac = accounting.NewAccounting("€", 2, ".", ",", "%v %s", "-%v %s", "")
 	case CURRENCY_NOK:
-		i18n.ac = accounting.NewAccounting("kr", 2, ".", ",", "%v %s", "-%v %s", "")
+		f.ac = accounting.NewAccounting("kr", 2, ".", ",", "%v %s", "-%v %s", "")
 	case CURRENCY_MXN:
-		i18n.ac = accounting.NewAccounting("$", 2, ",", ".", "%s %v", "-%s %v", "")
+		f.ac = accounting.NewAccounting("$", 2, ",", ".", "%s %v", "-%s %v", "")
 	default:
-		i18n.ac = accounting.NewAccounting("$", 2, ",", ".", "%s %v", "-%s %v", "")
+		f.ac = accounting.NewAccounting("$", 2, ",", ".", "%s %v", "-%s %v", "")
+	}
+}
+
+func (f *I18n) SetCountry(country string) {
+	f.country = strings.ToUpper(country)
+
+	switch f.country {
+	case COUNTRY_ES:
+		f.fmtDate = "02/01/2006"
+		f.fmtTime = "15:04:05"
+		f.fmtDateTime = "02/01/06 15:04:05"
+		f.fmtDateTimeTz = "02/01/06 15:04:05 -0700"
+	case COUNTRY_NO:
+		f.fmtDate = "02/01/2006"
+		f.fmtTime = "15:04:05"
+		f.fmtDateTime = "02/01/06 15:04:05"
+		f.fmtDateTimeTz = "02/01/06 15:04:05 -0700"
+	case COUNTRY_MX:
+		f.fmtDate = "02/01/2006"
+		f.fmtTime = "15:04:05"
+		f.fmtDateTime = "02/01/06 15:04:05"
+		f.fmtDateTimeTz = "02/01/06 15:04:05 -0700"
+
+	default:
+		f.fmtDate = "01/02/2006"
+		f.fmtTime = "15:04:05"
+		f.fmtDateTime = "01/02/06 15:04:05"
+		f.fmtDateTimeTz = "01/02/06 15:04:05 -0700"
 	}
 }
